@@ -60,7 +60,12 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-
+<!--grafico de barras-->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.3</version>
+        </dependency>
         <!--    Model Mapper dependency    -->
         <dependency>
             <groupId>org.modelmapper</groupId>

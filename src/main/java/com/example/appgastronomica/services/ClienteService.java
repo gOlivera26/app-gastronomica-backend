@@ -12,5 +12,7 @@ public interface ClienteService {
     Cliente crearCliente(Cliente cliente);
     Cliente eliminarClientePorNroDoc(String nroDoc);
     Cliente modificarCliente(Cliente cliente);
+    Cliente obtenerClientePorNroDoc(String nroDoc);
     List<Cliente> obtenerClientes();
+
 }

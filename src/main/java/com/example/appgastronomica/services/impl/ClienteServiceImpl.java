@@ -26,9 +26,16 @@ public class ClienteServiceImpl implements ClienteService {
     }
     @Override
     public Cliente crearCliente(Cliente cliente) {
+        if (!cliente.getNombre().matches("^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s]+$") || !cliente.getApellido().matches("^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s]+$")) {
+            throw new RuntimeException("El nombre y el apellido solo pueden contener letras y espacios");
+        }
         Optional<ClienteEntity> clienteEntities = clienteRepository.findByNroDoc(cliente.getNroDoc());
         if(clienteEntities.isPresent()){
             throw new RuntimeException("El numero de documento ya pertenece a un cliente");
+        }
+        clienteEntities = clienteRepository.findByTelefono(cliente.getTelefono());
+        if(clienteEntities.isPresent()){
+            throw new RuntimeException("El telefono ya pertenece a un cliente");
         }
         ClienteEntity clienteEntity = modelMapper.map(cliente, ClienteEntity.class);
         return modelMapper.map(clienteRepository.save(clienteEntity), Cliente.class);
@@ -46,6 +53,9 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     public Cliente modificarCliente(Cliente cliente) {
+        if (!cliente.getNombre().matches("^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s]+$") || !cliente.getApellido().matches("^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s]+$")) {
+            throw new RuntimeException("El nombre y el apellido solo pueden contener letras y espacios");
+        }
         if(cliente.getId() == null){
             throw new RuntimeException("El ID no puede ser nulo");
         }
@@ -69,6 +79,15 @@ public class ClienteServiceImpl implements ClienteService {
         else{
             throw new RuntimeException("El cliente no existe");
         }
+    }
+
+    @Override
+    public Cliente obtenerClientePorNroDoc(String nroDoc) {
+        Optional<ClienteEntity> clienteEntity = clienteRepository.findByNroDoc(nroDoc);
+        if(clienteEntity.isEmpty()){
+            throw new RuntimeException("El cliente no existe");
+        }
+        return modelMapper.map(clienteEntity.get(), Cliente.class);
     }
 
 

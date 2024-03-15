@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Table(name = "detalle_pedido")
 @Data
@@ -17,8 +15,9 @@ public class DetallePedidoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "detallePedido", cascade = CascadeType.ALL)
-    private List<ProductoEntity> productos;
+    @ManyToOne
+    @JoinColumn(name = "producto_id")
+    private ProductoEntity producto;
 
     @Column
     private Integer cantidad;
@@ -29,7 +28,7 @@ public class DetallePedidoEntity {
     @Column
     private Double subtotal;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) // Un detalle de pedido pertenece a un pedido
     @JoinColumn(name = "pedido_id")
     private PedidoEntity pedido;
 }

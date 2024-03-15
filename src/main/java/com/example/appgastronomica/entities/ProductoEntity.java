@@ -27,7 +27,4 @@ public class ProductoEntity {
     private TipoProductoEntity tipoProducto;
     @Column
     private String imagen;
-    @ManyToOne
-    @JoinColumn(name = "detalle_pedido_id")
-    private DetallePedidoEntity detallePedido;
 }
