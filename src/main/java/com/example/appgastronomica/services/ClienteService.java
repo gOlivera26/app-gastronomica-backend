@@ -9,6 +9,8 @@ import java.util.List;
 
 @Service
 public interface ClienteService {
-    Mono<Cliente> crearCliente(Cliente cliente);
-    Flux<Cliente> obtenerClientes();
+    Cliente crearCliente(Cliente cliente);
+    Cliente eliminarClientePorNroDoc(String nroDoc);
+    Cliente modificarCliente(Cliente cliente);
+    List<Cliente> obtenerClientes();
 }

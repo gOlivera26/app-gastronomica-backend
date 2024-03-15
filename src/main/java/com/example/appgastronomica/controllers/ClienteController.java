@@ -1,19 +1,15 @@
 package com.example.appgastronomica.controllers;
 
+import com.example.appgastronomica.entities.ClienteEntity;
 import com.example.appgastronomica.models.Cliente;
 import com.example.appgastronomica.services.ClienteService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
 
 import java.util.List;
 
@@ -29,34 +25,35 @@ public class ClienteController {
     }
 
     @PostMapping("/postCliente")
-    public Mono<ResponseEntity<Cliente>> createPersona(@RequestBody Cliente cliente) {
-        if (cliente == null) {
-            log.warn("Se recibió una solicitud con cliente nulo.");
-            return Mono.error(new IllegalArgumentException("Cliente no puede ser nulo"));
+    public ResponseEntity<Cliente> createPersona(@RequestBody Cliente cliente) {
+        Cliente clienteCreado = clienteService.crearCliente(cliente);
+        if(clienteCreado == null){
+            log.warn("No se pudo crear el cliente");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        return clienteService.crearCliente(cliente)
-                .map(createdCliente -> {
-                    log.info("Cliente creado con éxito: {}", createdCliente);
-                    return ResponseEntity.ok(createdCliente);
-                })
-                .onErrorMap(e -> {
-                    log.error("Error al crear cliente: {}", e.getMessage());
-                    return e;
-                });
+        log.info("Cliente creado: {}", clienteCreado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(clienteCreado);
+    }
+    @DeleteMapping("/deleteCliente/{nroDoc}")
+    public ResponseEntity<Cliente> deleteCliente(@PathVariable String nroDoc) {
+        Cliente clienteEliminado = clienteService.eliminarClientePorNroDoc(nroDoc);
+        if(clienteEliminado == null){
+            log.warn("No se pudo eliminar el cliente");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        log.info("Cliente eliminado: {}", clienteEliminado);
+        return ResponseEntity.status(HttpStatus.OK).body(clienteEliminado);
     }
 
     @GetMapping("/getAllClientes")
-    public Flux<Cliente> getAllClientes() {
-        return clienteService.obtenerClientes()
-                .collectList()
-                .flatMapMany(clientes -> {
-                    if (clientes.isEmpty()) {
-                        log.warn("No se encontraron clientes.");
-                        return Flux.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron clientes"));
-                    }
-                    log.info("Clientes encontrados: {}", clientes);
-                    return Flux.fromIterable(clientes);
-                });
+    public ResponseEntity<List<Cliente>> getAllClientes() {
+        List<Cliente> clientes = clienteService.obtenerClientes();
+        if(clientes.isEmpty()){
+            log.warn("No se encontraron clientes");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron clientes");
+        }
+        log.info("Clientes encontrados: {}", clientes);
+        return ResponseEntity.status(HttpStatus.OK).body(clientes);
     }
 
 }

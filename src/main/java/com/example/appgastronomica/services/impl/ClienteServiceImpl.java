@@ -25,21 +25,58 @@ public class ClienteServiceImpl implements ClienteService {
         this.clienteRepository = clienteRepository;
     }
     @Override
-    public Mono<Cliente> crearCliente(Cliente cliente) {
-        return Mono.fromCallable(() -> {
-            Optional<ClienteEntity> existeCliente = clienteRepository.findByNroDoc(cliente.getNroDoc());
-            if (existeCliente.isPresent()) {
-                throw new RuntimeException("El numero de documento ya existe en otro cliente");
-            }
-            ClienteEntity clienteEntity = modelMapper.map(cliente, ClienteEntity.class);
-            ClienteEntity clienteGuardado = clienteRepository.save(clienteEntity);
-            return modelMapper.map(clienteGuardado, Cliente.class);
-        });
+    public Cliente crearCliente(Cliente cliente) {
+        Optional<ClienteEntity> clienteEntities = clienteRepository.findByNroDoc(cliente.getNroDoc());
+        if(clienteEntities.isPresent()){
+            throw new RuntimeException("El numero de documento ya pertenece a un cliente");
+        }
+        ClienteEntity clienteEntity = modelMapper.map(cliente, ClienteEntity.class);
+        return modelMapper.map(clienteRepository.save(clienteEntity), Cliente.class);
     }
 
     @Override
-    public Flux<Cliente> obtenerClientes() {
-        Flux<ClienteEntity> clienteEntityFlux = Flux.fromIterable(clienteRepository.findAll());
-        return clienteEntityFlux.map(clienteEntity -> modelMapper.map(clienteEntity, Cliente.class));
+    public Cliente eliminarClientePorNroDoc(String nroDoc) {
+        Optional<ClienteEntity> clienteEntity = clienteRepository.findByNroDoc(nroDoc);
+        if(clienteEntity.isEmpty()){
+            throw new RuntimeException("El cliente no existe");
+        }
+        clienteRepository.delete(clienteEntity.get());
+        return modelMapper.map(clienteEntity.get(), Cliente.class);
     }
+
+    @Override
+    public Cliente modificarCliente(Cliente cliente) {
+        if(cliente.getId() == null){
+            throw new RuntimeException("El ID no puede ser nulo");
+        }
+        Optional<ClienteEntity> clienteEntityOptional = clienteRepository.findById(cliente.getId());
+        if(clienteEntityOptional.isPresent()){
+            ClienteEntity clienteEntity = clienteEntityOptional.get();
+            if(!clienteEntity.getNroDoc().equals(cliente.getNroDoc()) && clienteRepository.findByNroDoc(cliente.getNroDoc()).isPresent()){
+                throw new RuntimeException("El numero de documento ya pertenece a un cliente");
+            }
+            if(!clienteEntity.getTelefono().equals(cliente.getTelefono()) && clienteRepository.findByTelefono(cliente.getTelefono()).isPresent()){
+                throw new RuntimeException("El telefono ya pertenece a un cliente");
+            }
+            clienteEntity.setNombre(cliente.getNombre());
+            clienteEntity.setApellido(cliente.getApellido());
+            clienteEntity.setNroDoc(cliente.getNroDoc());
+            clienteEntity.setTelefono(cliente.getTelefono());
+
+            ClienteEntity clienteGuardado = clienteRepository.save(clienteEntity);
+            return modelMapper.map(clienteGuardado, Cliente.class);
+        }
+        else{
+            throw new RuntimeException("El cliente no existe");
+        }
+    }
+
+
+    @Override
+    public List<Cliente> obtenerClientes() {
+        List<ClienteEntity> clienteEntities = clienteRepository.findAll();
+        return clienteEntities.stream().map(clienteEntity -> modelMapper.map(clienteEntity, Cliente.class)).toList();
+    }
+
+
 }
