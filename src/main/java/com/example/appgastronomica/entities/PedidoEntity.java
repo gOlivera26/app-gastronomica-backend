@@ -1,5 +1,6 @@
 package com.example.appgastronomica.entities;
 
+import com.example.appgastronomica.enums.EstadoPedido;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,8 +32,8 @@ public class PedidoEntity {
     @Column
     private Double total;
 
-    @Column
-    private Boolean estado;
+    @Enumerated(EnumType.STRING)
+    private EstadoPedido estado;
 
     @Column
     private String observacion;

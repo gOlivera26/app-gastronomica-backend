@@ -17,7 +17,7 @@ public class PedidoResponse {
     private String nroDoc;
     private LocalDateTime fechaPedido;
     private String direccionEntrega;
-    private Boolean estado;
+    private String estado;
     private String observacion;
     private Double total;
     private List<DetallePedidoResponse> detallePedido;

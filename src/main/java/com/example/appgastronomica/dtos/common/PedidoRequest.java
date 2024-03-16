@@ -16,7 +16,6 @@ public class PedidoRequest {
     private Long idCliente;
     private LocalDateTime fechaPedido;
     private String direccionEntrega;
-    private Boolean estado;
     private String observacion;
     private List<DetallePedidoRequest> detallePedido;
 }

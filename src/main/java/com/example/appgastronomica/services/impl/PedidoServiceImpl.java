@@ -8,6 +8,7 @@ import com.example.appgastronomica.entities.ClienteEntity;
 import com.example.appgastronomica.entities.DetallePedidoEntity;
 import com.example.appgastronomica.entities.PedidoEntity;
 import com.example.appgastronomica.entities.ProductoEntity;
+import com.example.appgastronomica.enums.EstadoPedido;
 import com.example.appgastronomica.repository.ClienteRepository;
 import com.example.appgastronomica.repository.DetallePedidoRepository;
 import com.example.appgastronomica.repository.PedidoRepository;
@@ -49,6 +50,7 @@ public class PedidoServiceImpl implements PedidoService {
             }
 
             PedidoEntity pedido = modelMapper.map(pedidoRequest, PedidoEntity.class);
+            pedido.setEstado(EstadoPedido.REGISTRADO);
 
             double totalPedido = 0.0;
             for (DetallePedidoEntity detalle : pedido.getDetallePedido()) {
@@ -73,10 +75,7 @@ public class PedidoServiceImpl implements PedidoService {
         }
     }
 
-    @Override
-    public PedidoRequest actualizarPedido(PedidoRequest pedido) {
 
-    }
 
     @Override
     public List<PedidoResponse> obtenerPedidos() {

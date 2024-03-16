@@ -10,6 +10,5 @@ import java.util.List;
 public interface PedidoService {
 
     PedidoRequest crearPedido(PedidoRequest pedido);
-    PedidoRequest actualizarPedido(PedidoRequest pedido);
     List<PedidoResponse> obtenerPedidos();
 }
