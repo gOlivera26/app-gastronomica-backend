@@ -21,10 +21,6 @@ public class DetallePedidoEntity {
 
     @Column
     private Integer cantidad;
-
-    @Column
-    private Double precio;
-
     @Column
     private Double subtotal;
 

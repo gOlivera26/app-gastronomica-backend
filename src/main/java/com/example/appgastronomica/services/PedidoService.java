@@ -1,10 +1,15 @@
 package com.example.appgastronomica.services;
 
+import com.example.appgastronomica.dtos.common.PedidoRequest;
 import com.example.appgastronomica.dtos.common.PedidoResponse;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface PedidoService {
 
-    PedidoResponse crearPedido(PedidoResponse pedido);
+    PedidoRequest crearPedido(PedidoRequest pedido);
+    PedidoRequest actualizarPedido(PedidoRequest pedido);
+    List<PedidoResponse> obtenerPedidos();
 }

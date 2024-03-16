@@ -7,8 +7,6 @@ import com.example.appgastronomica.services.ClienteService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
@@ -105,6 +103,5 @@ public class ClienteServiceImpl implements ClienteService {
         List<ClienteEntity> clienteEntities = clienteRepository.findAll();
         return clienteEntities.stream().map(clienteEntity -> modelMapper.map(clienteEntity, Cliente.class)).toList();
     }
-
 
 }
