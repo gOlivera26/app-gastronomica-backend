@@ -37,6 +37,11 @@ public class ClienteServiceImpl implements ClienteService {
         if(clienteEntities.isPresent()){
             throw new RuntimeException("El telefono ya pertenece a un cliente");
         }
+        clienteEntities = clienteRepository.findByEmail(cliente.getEmail());
+        if(clienteEntities.isPresent()){
+            throw new RuntimeException("El email ya esta en uso");
+        }
+
         ClienteEntity clienteEntity = modelMapper.map(cliente, ClienteEntity.class);
         return modelMapper.map(clienteRepository.save(clienteEntity), Cliente.class);
     }
@@ -68,10 +73,14 @@ public class ClienteServiceImpl implements ClienteService {
             if(!clienteEntity.getTelefono().equals(cliente.getTelefono()) && clienteRepository.findByTelefono(cliente.getTelefono()).isPresent()){
                 throw new RuntimeException("El telefono ya pertenece a un cliente");
             }
+            if(!clienteEntity.getEmail().equals(cliente.getEmail()) && clienteRepository.findByEmail(cliente.getEmail()).isPresent()){
+                throw new RuntimeException("El email ya esta en uso");
+            }
             clienteEntity.setNombre(cliente.getNombre());
             clienteEntity.setApellido(cliente.getApellido());
             clienteEntity.setNroDoc(cliente.getNroDoc());
             clienteEntity.setTelefono(cliente.getTelefono());
+            clienteEntity.setEmail(cliente.getEmail());
 
             ClienteEntity clienteGuardado = clienteRepository.save(clienteEntity);
             return modelMapper.map(clienteGuardado, Cliente.class);

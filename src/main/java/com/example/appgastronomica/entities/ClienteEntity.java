@@ -21,4 +21,6 @@ public class ClienteEntity {
     private String telefono;
     @Column
     private String nroDoc;
+    @Column
+    private String email;
 }
