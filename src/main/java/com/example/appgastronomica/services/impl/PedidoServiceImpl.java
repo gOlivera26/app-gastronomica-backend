@@ -1,6 +1,7 @@
 package com.example.appgastronomica.services.impl;
 
 
+import com.example.appgastronomica.dtos.common.DetallePedidoRequest;
 import com.example.appgastronomica.dtos.common.DetallePedidoResponse;
 import com.example.appgastronomica.dtos.common.PedidoRequest;
 import com.example.appgastronomica.dtos.common.PedidoResponse;
@@ -75,7 +76,37 @@ public class PedidoServiceImpl implements PedidoService {
         }
     }
 
+    @Override
+    public String actualizarEstadoPedido(Long idPedido, String estado) {
+        Optional<PedidoEntity> pedido = pedidoRepository.findById(idPedido);
+        if(pedido.isPresent()){
+            pedido.get().setEstado(EstadoPedido.valueOf(estado));
+            pedidoRepository.save(pedido.get());
+            return "Estado del pedido actualizado";
+        }
+        else{
+            throw new RuntimeException("Pedido no encontrado");
+        }
+    }
 
+    @Override
+    public void eliminarPedido(Long idPedido) {
+        Optional<PedidoEntity> pedido = pedidoRepository.findById(idPedido);
+        if(pedido.isPresent()){
+            pedidoRepository.delete(pedido.get());
+        }
+        else{
+            throw new RuntimeException("Pedido no encontrado");
+        }
+    }
+
+    @Override
+    public void eliminarPedidosCancelados() {
+        List<PedidoEntity> pedidos = pedidoRepository.findByEstado(EstadoPedido.CANCELADO);
+        if(!pedidos.isEmpty()){
+            pedidoRepository.deleteAll(pedidos);
+        }
+    }
 
     @Override
     public List<PedidoResponse> obtenerPedidos() {
@@ -88,6 +119,7 @@ public class PedidoServiceImpl implements PedidoService {
             pedidoResponse.setApellido(pedido.getCliente().getApellido());
             pedidoResponse.setNroDoc(pedido.getCliente().getNroDoc());
             pedidoResponse.setDetallePedido(new ArrayList<>());
+            //obtener el nombre del producto y el precio
             for (DetallePedidoEntity detalle : pedido.getDetallePedido()) {
                 DetallePedidoResponse detalleResponse = modelMapper.map(detalle, DetallePedidoResponse.class);
                 detalleResponse.setProducto(detalle.getProducto().getNombre());
@@ -97,6 +129,116 @@ public class PedidoServiceImpl implements PedidoService {
             pedidoResponses.add(pedidoResponse);
         }
         return pedidoResponses;
+    }
+
+    @Override
+    public DetallePedidoRequest crearDetallePedido(DetallePedidoRequest detallePedido, Long idPedido) {
+        try {
+            Optional<PedidoEntity> optionalPedido = pedidoRepository.findById(idPedido);
+            if (optionalPedido.isPresent()) {
+                PedidoEntity pedido = optionalPedido.get();
+
+                DetallePedidoEntity detalle = modelMapper.map(detallePedido, DetallePedidoEntity.class);
+                detalle.setPedido(pedido);
+                double precioProducto = obtenerPrecioProducto(detalle.getProducto().getId());
+                double subtotalDetalle = precioProducto * detalle.getCantidad();
+                detalle.setSubtotal(subtotalDetalle);
+                detallePedidoRepository.save(detalle);
+
+                //actualizar el monto total del pedido
+                double totalPedido = calcularTotalPedido(pedido.getDetallePedido());
+                pedido.setTotal(totalPedido);
+                pedidoRepository.save(pedido);
+
+                return modelMapper.map(detalle, DetallePedidoRequest.class);
+            } else {
+                throw new RuntimeException("Pedido no encontrado");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error al crear el detalle del pedido", e);
+        }
+    }
+
+    @Override
+    public DetallePedidoRequest eliminarDetallePedido(Long idDetallePedido) {
+        try {
+            Optional<DetallePedidoEntity> detalleOptional = detallePedidoRepository.findById(idDetallePedido);
+            if(detalleOptional.isPresent()){
+                DetallePedidoEntity detalle = detalleOptional.get();
+                detallePedidoRepository.delete(detalle);
+
+                Optional<PedidoEntity> pedidoOptional = pedidoRepository.findById(detalle.getPedido().getId());
+                if (pedidoOptional.isPresent()) {
+                    PedidoEntity pedido = pedidoOptional.get();
+                    List<DetallePedidoEntity> detallesPedido = pedido.getDetallePedido();
+                    detallesPedido.remove(detalle);
+
+                    //actualizar el monto total del pedido restando el subtotal eliminado
+                    double totalPedido = calcularTotalPedido(detallesPedido);
+                    pedido.setTotal(totalPedido);
+                    pedidoRepository.save(pedido);
+                } else {
+                    throw new RuntimeException("Pedido asociado al detalle no encontrado");
+                }
+
+                return modelMapper.map(detalle, DetallePedidoRequest.class);
+            } else {
+                throw new RuntimeException("Detalle no encontrado");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar el detalle del pedido", e);
+        }
+    }
+
+    private double calcularTotalPedido(List<DetallePedidoEntity> detallesPedido) {
+        double total = 0.0;
+        for (DetallePedidoEntity detalle : detallesPedido) {
+            total += detalle.getSubtotal();
+        }
+        return total;
+    }
+
+    @Override
+    public DetallePedidoRequest editarDetallePedido(Long idDetallePedido, DetallePedidoRequest detallePedidoRequest) {
+        try {
+            Optional<DetallePedidoEntity> detalleOptional = detallePedidoRepository.findById(idDetallePedido);
+            if(detalleOptional.isPresent()){
+                DetallePedidoEntity detalle = detalleOptional.get();
+
+                // Actualizar los campos del detalle con los nuevos valores
+                detalle.setCantidad(detallePedidoRequest.getCantidad());
+                detalle.setProducto(productoRepository.findById(detallePedidoRequest.getIdProducto())
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado")));
+
+                // Calcular el nuevo subtotal
+                double precioProducto = obtenerPrecioProducto(detalle.getProducto().getId());
+                double subtotalDetalle = precioProducto * detalle.getCantidad();
+                detalle.setSubtotal(subtotalDetalle);
+
+                // Guardar el detalle actualizado
+                DetallePedidoEntity detalleActualizado = detallePedidoRepository.save(detalle);
+
+                // Buscar el pedido asociado al detalle
+                Optional<PedidoEntity> pedidoOptional = pedidoRepository.findById(detalle.getPedido().getId());
+                if (pedidoOptional.isPresent()) {
+                    PedidoEntity pedido = pedidoOptional.get();
+                    List<DetallePedidoEntity> detallesPedido = pedido.getDetallePedido();
+
+                    // Recalcular el monto total del pedido
+                    double totalPedido = calcularTotalPedido(detallesPedido);
+                    pedido.setTotal(totalPedido);
+                    pedidoRepository.save(pedido);
+                } else {
+                    throw new RuntimeException("Pedido asociado al detalle no encontrado");
+                }
+
+                return modelMapper.map(detalleActualizado, DetallePedidoRequest.class);
+            } else {
+                throw new RuntimeException("Detalle no encontrado");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error al editar el detalle del pedido", e);
+        }
     }
 
     private double obtenerPrecioProducto(Long idProducto) {

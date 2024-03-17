@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PedidoResponse {
+    private Long idPedido;
     private Long idCliente;
     private String nombre;
     private String apellido;
