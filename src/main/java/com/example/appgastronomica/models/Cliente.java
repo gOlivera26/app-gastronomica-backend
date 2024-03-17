@@ -14,4 +14,8 @@ public class Cliente {
     private String telefono;
     private String nroDoc;
     private String email;
+
+    public String nombreCompleto(){
+        return this.getNombre()+" "+this.getApellido();
+    }
 }
