@@ -1,12 +1,13 @@
-package com.example.appgastronomica;
+package com.example.microserviceusuarios;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AppGastronomicaApplication {
+public class MicroserviceUsuariosApplication {
+
     public static void main(String[] args) {
-        SpringApplication.run(AppGastronomicaApplication.class, args);
+        SpringApplication.run(MicroserviceUsuariosApplication.class, args);
     }
 
 }
