@@ -10,6 +10,7 @@ import com.example.microserviceusuarios.jwt.JwtService;
 import com.example.microserviceusuarios.repository.RolRepository;
 import com.example.microserviceusuarios.repository.UsuarioRepository;
 import com.example.microserviceusuarios.services.AuthService;
+import com.example.microserviceusuarios.services.EmailService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,10 +32,11 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final EmailService emailService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public AuthServiceImpl(UsuarioRepository usuarioRepository, RolRepository rolRepository, JwtService jwtService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, UserDetailsService userDetailsService, ModelMapper modelMapper) {
+    public AuthServiceImpl(UsuarioRepository usuarioRepository, RolRepository rolRepository, JwtService jwtService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, UserDetailsService userDetailsService, ModelMapper modelMapper, EmailService emailService) {
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
         this.jwtService = jwtService;
@@ -42,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.modelMapper = modelMapper;
+        this.emailService = emailService;
     }
 
     @Override
@@ -151,12 +154,11 @@ public class AuthServiceImpl implements AuthService {
         user.setVerificationCode(verificationCode);
         usuarioRepository.save(user);
     }
-  /*  @Override
-    public void sendVerificationCode(String email, String verificationCode) {
+   @Override
+   public void sendVerificationCode(String email, String verificationCode) {
         emailService.sendVerificationCode(email, verificationCode);
     }
 
-   */
     @Override
     public String generateTokenForPasswordReset(String email, String verificationCode) {
         // Verifica el código de verificación para el usuario con el correo electrónico dado

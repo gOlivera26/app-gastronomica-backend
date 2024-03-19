@@ -22,13 +22,15 @@ public class UsuarioController {
     }
 
     @PostMapping("/crearRol")
-    public ResponseEntity<Rol> crearRol(@RequestBody Rol rol){
-        Rol rolCreado = usuarioService.crearRol(rol);
-        if(rolCreado == null){
-            log.warn("No se pudo crear el rol");
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> crearRol(@RequestBody Rol rol){
+        try {
+            Rol rolCreado = usuarioService.crearRol(rol);
+            log.info("Rol creado: {}", rolCreado);
+            return ResponseEntity.ok(rolCreado);
+        } catch (RuntimeException e) {
+            String errorMessage = "Error al crear el rol: " + e.getMessage();
+            log.warn(errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage);
         }
-        log.info("Rol creado: {}", rolCreado);
-        return ResponseEntity.ok(rolCreado);
     }
 }

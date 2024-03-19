@@ -37,10 +37,10 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             // Handle authentication exceptions here
                             // You can customize the response or redirect to a login page
-                            log.error("Unauthorized access attempt: {}", authException.getMessage());
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                         }))
                 .build();
     }
 
 }
+
+

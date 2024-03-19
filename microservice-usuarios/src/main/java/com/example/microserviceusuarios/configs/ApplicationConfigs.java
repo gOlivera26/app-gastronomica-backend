@@ -37,7 +37,7 @@ public class ApplicationConfigs {
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> userRepository.findByEmail(email)
-                .map(user -> (UserDetails) user) // Convertir User a UserDetails
+                .map(user -> (UserDetails) user)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }
