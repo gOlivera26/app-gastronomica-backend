@@ -103,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
-        Boolean active = usuarioRepository.findByEmail(loginRequest.getUsername())
+        Boolean active = usuarioRepository.findByUsername(loginRequest.getUsername()) // Aquí cambia de findByEmail a findByUsername
                 .map(UsuarioEntity::getActivo)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         if(!active){
@@ -111,13 +111,14 @@ public class AuthServiceImpl implements AuthService {
         }
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        UserDetails user = usuarioRepository.findByEmail(loginRequest.getUsername())
+        UserDetails user = usuarioRepository.findByUsername(loginRequest.getUsername()) // Aquí cambia de findByEmail a findByUsername
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         String token = jwtService.getToken(user);
         return AuthResponse.builder()
                 .token(token)
                 .build();
     }
+
 
     @Override
     public boolean actualizarPasswordUsingToken(String token, String newPassword) {
