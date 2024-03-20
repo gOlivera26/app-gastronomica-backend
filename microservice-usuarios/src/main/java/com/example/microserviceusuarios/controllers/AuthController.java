@@ -1,18 +1,17 @@
 package com.example.microserviceusuarios.controllers;
 
+import com.example.microserviceusuarios.clients.RestTemplateClientes;
 import com.example.microserviceusuarios.dtos.*;
 import com.example.microserviceusuarios.services.AuthService;
-import com.example.microserviceusuarios.services.EmailService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import java.util.Map;
+import java.util.List;
 
 @RequestMapping("/auth")
 @RestController
@@ -20,10 +19,12 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final RestTemplateClientes restTemplateClientes;
 
     @Autowired
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, RestTemplateClientes restTemplateClientes) {
         this.authService = authService;
+        this.restTemplateClientes = restTemplateClientes;
     }
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
@@ -115,6 +116,10 @@ public class AuthController {
             log.error("Error during password update: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+    @GetMapping("/getAllClientes")
+    public ResponseEntity<List<ClienteRequest>> getClientes(){
+        return ResponseEntity.ok(restTemplateClientes.getAllClientes());
     }
 
 }
