@@ -94,10 +94,26 @@ public class AuthServiceImpl implements AuthService {
         }
         UsuarioEntity usuarioEntity = usuarioRepository.findById(updateUserRequest.getId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Optional<UsuarioEntity> existeEmail = usuarioRepository.findByEmail(updateUserRequest.getEmail());
+        if(existeEmail.isPresent() && !existeEmail.get().getId().equals(updateUserRequest.getId())) {
+            throw new RuntimeException("Email está en uso");
+        }
+        Optional<UsuarioEntity> existeNroDoc = usuarioRepository.findByNroDoc(updateUserRequest.getNroDoc());
+        if(existeNroDoc.isPresent() && !existeNroDoc.get().getId().equals(updateUserRequest.getId())) {
+            throw new RuntimeException("Número de documento ya está en uso");
+        }
+        Optional<UsuarioEntity> existeUsername = usuarioRepository.findByUsername(updateUserRequest.getUsername());
+        if(existeUsername.isPresent() && !existeUsername.get().getId().equals(updateUserRequest.getId())) {
+            throw new RuntimeException("Nombre de usuario ya está en uso");
+        }
+
         usuarioEntity.setNombre(updateUserRequest.getNombre());
         usuarioEntity.setApellido(updateUserRequest.getApellido());
         usuarioEntity.setNroDoc(updateUserRequest.getNroDoc());
         usuarioEntity.setTelefono(updateUserRequest.getTelefono());
+        usuarioEntity.setUsername(updateUserRequest.getUsername());
+        usuarioEntity.setEmail(updateUserRequest.getEmail());
 
         RolEntity rol = rolRepository.findById(updateUserRequest.getIdRol().getId())
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
@@ -108,7 +124,6 @@ public class AuthServiceImpl implements AuthService {
         usuarioEntity.setActivo(updateUserRequest.getActivo());
         return usuarioRepository.save(usuarioEntity);
     }
-
 
     @Transactional
     @Override
@@ -158,7 +173,6 @@ public class AuthServiceImpl implements AuthService {
                 })
                 .orElse(false);
     }
-
 
     @Transactional
     @Override

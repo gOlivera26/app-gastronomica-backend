@@ -31,7 +31,6 @@ public class EmailServiceImpl implements EmailService {
 
             Transport.send(message);
 
-
         } catch (MessagingException e) {
             throw new RuntimeException("Error al enviar el correo electrónico: " + e.getMessage());
         }
