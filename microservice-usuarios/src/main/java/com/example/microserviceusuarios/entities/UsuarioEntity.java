@@ -46,18 +46,28 @@ public class UsuarioEntity implements UserDetails {
     @Column
     private String verificationCode;
     @Column
-    private String imagenProfile;
-
-
+    @Lob
+    private byte[] imagenProfile;
     @ManyToOne
     @JoinColumn(name = "rol_id", referencedColumnName = "id")
     private RolEntity rol;
 
+    public UsuarioEntity(Long id, String nombre, String apellido, String username, String nroDoc, String email, String telefono, String password, Boolean activo, String verificationCode, RolEntity rol) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.username = username;
+        this.nroDoc = nroDoc;
+        this.email = email;
+        this.telefono = telefono;
+        this.password = password;
+        this.activo = activo;
+        this.verificationCode = verificationCode;
+        this.rol = rol;
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String rolDescripcion = rol.getDescripcion();
-
-        // Asignar el rol de Spring Security correspondiente según la descripción del rol
         switch (rolDescripcion) {
             case "Admin":
                 return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));

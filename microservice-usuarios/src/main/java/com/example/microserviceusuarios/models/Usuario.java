@@ -15,9 +15,6 @@ public class Usuario {
     private String email;
     private String nroDoc;
     private String telefono;
-    private String password;
-    private String token;
-    private String verificationCode;
     private Boolean activo;
     private String imagenProfile;
     private Rol rol;

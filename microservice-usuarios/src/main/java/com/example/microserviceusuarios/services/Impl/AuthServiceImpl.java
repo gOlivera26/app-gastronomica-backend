@@ -11,6 +11,7 @@ import com.example.microserviceusuarios.repository.RolRepository;
 import com.example.microserviceusuarios.repository.UsuarioRepository;
 import com.example.microserviceusuarios.services.AuthService;
 import com.example.microserviceusuarios.services.EmailService;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
         this.emailService = emailService;
     }
 
+    @Transactional
     @Override
     public AuthResponse registro(RegistroRequest registroRequest) {
         Optional<UsuarioEntity> existingUserEmail = usuarioRepository.findByEmail(registroRequest.getEmail());
@@ -84,26 +86,34 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    @Transactional
     @Override
     public UsuarioEntity actualizarUsuario(UpdateUserRequest updateUserRequest) {
         if(updateUserRequest == null){
             throw new IllegalArgumentException("La solicitud de actualización no debe ser nula");
         }
-       UsuarioEntity usuarioEntity = usuarioRepository.findById(updateUserRequest.getId())
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        UsuarioEntity usuarioEntity = usuarioRepository.findById(updateUserRequest.getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         usuarioEntity.setNombre(updateUserRequest.getNombre());
         usuarioEntity.setApellido(updateUserRequest.getApellido());
         usuarioEntity.setNroDoc(updateUserRequest.getNroDoc());
         usuarioEntity.setTelefono(updateUserRequest.getTelefono());
-        usuarioEntity.setRol(updateUserRequest.getIdRol());
+
+        RolEntity rol = rolRepository.findById(updateUserRequest.getIdRol().getId())
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+
+        usuarioEntity.setRol(rol);
+
         usuarioEntity.setEmail(updateUserRequest.getEmail());
         usuarioEntity.setActivo(updateUserRequest.getActivo());
         return usuarioRepository.save(usuarioEntity);
     }
 
+
+    @Transactional
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
-        Boolean active = usuarioRepository.findByUsername(loginRequest.getUsername()) // Aquí cambia de findByEmail a findByUsername
+        Boolean active = usuarioRepository.findByUsername(loginRequest.getUsername())
                 .map(UsuarioEntity::getActivo)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         if(!active){
@@ -111,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        UserDetails user = usuarioRepository.findByUsername(loginRequest.getUsername()) // Aquí cambia de findByEmail a findByUsername
+        UserDetails user = usuarioRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         String token = jwtService.getToken(user);
         return AuthResponse.builder()
@@ -120,6 +130,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    @Transactional
     @Override
     public boolean actualizarPasswordUsingToken(String token, String newPassword) {
         String username = jwtService.getUsernameFromToken(token);
@@ -137,6 +148,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Transactional
     @Override
     public boolean verificarPasswordResetCode(String email, String verificationCode) {
         return usuarioRepository.findByEmail(email)
@@ -148,6 +160,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    @Transactional
     @Override
     public void storeVerificationCodeInDatabase(String email, String verificationCode) {
         UsuarioEntity user = usuarioRepository.findByEmail(email)
@@ -155,22 +168,25 @@ public class AuthServiceImpl implements AuthService {
         user.setVerificationCode(verificationCode);
         usuarioRepository.save(user);
     }
+    @Transactional
    @Override
    public void sendVerificationCode(String email, String verificationCode) {
         emailService.sendVerificationCode(email, verificationCode);
     }
 
+    @Transactional
     @Override
     public String generateTokenForPasswordReset(String email, String verificationCode) {
-        // Verifica el código de verificación para el usuario con el correo electrónico dado
+        //Verifica el código de verificación para el usuario con el correo electrónico dado
         if (verificarPasswordResetCode(email, verificationCode)) {
-            // Genera un token para permitir la modificación de las credenciales
+            //Genera un token para permitir la modificación de las credenciales
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             return jwtService.getToken(userDetails);
         } else {
             throw new RuntimeException("Código de verificación no válido");
         }
     }
+
     @Override
     public String generateVerificationCode() {
         return String.format("%06d", new Random().nextInt(1000000));

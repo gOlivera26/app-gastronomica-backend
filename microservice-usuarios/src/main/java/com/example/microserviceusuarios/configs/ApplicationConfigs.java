@@ -1,6 +1,7 @@
 package com.example.microserviceusuarios.configs;
 
 import com.example.microserviceusuarios.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +37,7 @@ public class ApplicationConfigs {
     }
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
+        return username -> userRepository.findByUsernameWithoutImage(username)
                 .map(user -> (UserDetails) user)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

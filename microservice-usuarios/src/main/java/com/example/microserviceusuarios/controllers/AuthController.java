@@ -2,6 +2,7 @@ package com.example.microserviceusuarios.controllers;
 
 import com.example.microserviceusuarios.dtos.*;
 import com.example.microserviceusuarios.services.AuthService;
+import com.example.microserviceusuarios.services.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

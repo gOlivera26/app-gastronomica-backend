@@ -33,7 +33,8 @@ public class SecurityConfig {
                 .authorizeRequests(authRequest ->
                         authRequest
                                 .requestMatchers("/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                                .requestMatchers("/usuarios/crearRol").hasRole("ADMIN") // Requiere rol ADMIN para /usuarios/crearRol
+                                .requestMatchers("/usuarios/crearRol").hasAnyRole("COOK", "ADMIN")
+                                .requestMatchers("/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
