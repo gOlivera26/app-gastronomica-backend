@@ -176,11 +176,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     @Override
-    public String generateTokenForPasswordReset(String email, String verificationCode) {
+    public String generateTokenForPasswordReset(String username, String verificationCode) {
         //Verifica el código de verificación para el usuario con el correo electrónico dado
-        if (verificarPasswordResetCode(email, verificationCode)) {
+        if (verificarPasswordResetCode(username, verificationCode)) {
             //Genera un token para permitir la modificación de las credenciales
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             return jwtService.getToken(userDetails);
         } else {
             throw new RuntimeException("Código de verificación no válido");

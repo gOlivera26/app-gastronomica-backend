@@ -88,7 +88,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<AuthResponse> resetPassword(@RequestBody UpdateCredentialRequest resetPasswordRequest) {
         try {
-            String token = authService.generateTokenForPasswordReset(resetPasswordRequest.getEmail(), resetPasswordRequest.getVerificationCode());
+            String token = authService.generateTokenForPasswordReset(resetPasswordRequest.getUsername(), resetPasswordRequest.getVerificationCode());
             return ResponseEntity.ok(AuthResponse.builder().token(token).build());
         } catch (RuntimeException e) {
             log.error("Error during password reset: {}", e.getMessage());

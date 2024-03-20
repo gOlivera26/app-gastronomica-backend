@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UpdateCredentialRequest {
-    private String email;
+    private String username;
     private String verificationCode;
 }
