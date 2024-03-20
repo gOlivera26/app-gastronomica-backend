@@ -151,7 +151,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public boolean verificarPasswordResetCode(String email, String verificationCode) {
-        return usuarioRepository.findByEmail(email)
+        return usuarioRepository.findByUsername(email)
                 .map(user -> {
                     String storedVerificationCode = user.getVerificationCode();
                     return storedVerificationCode != null && storedVerificationCode.equals(verificationCode);
