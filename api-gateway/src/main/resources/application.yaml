@@ -1,0 +1,56 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: cliente_route
+          uri: ${CLIENTE_MICROSERVICE_URI:http://localhost:8085}
+          predicates:
+            - Path=/cliente/**
+          filters:
+            - AddRequestHeader=X-Powered-By, Spring Gateway
+
+        - id: email_route
+          uri: ${EMAIL_MICROSERVICE_URI:http://localhost:8085}
+          predicates:
+            - Path=/email/**
+          filters:
+            - AddRequestHeader=X-Powered-By, Spring Gateway
+
+        - id: pedidos_route
+          uri: ${PEDIDOS_MICROSERVICE_URI:http://localhost:8085}
+          predicates:
+            - Path=/pedidos/**
+          filters:
+            - AddRequestHeader=X-Powered-By, Spring Gateway
+
+        - id: producto_route
+          uri: ${PRODUCTO_MICROSERVICE_URI:http://localhost:8085}
+          predicates:
+            - Path=/producto/**
+          filters:
+            - AddRequestHeader=X-Powered-By, Spring Gateway
+
+        - id: usuarios_route
+          uri: ${USUARIOS_MICROSERVICE_URI:http://localhost:8084}
+          predicates:
+            - Path=/usuarios/**
+          filters:
+            - AddRequestHeader=X-Powered-By, Spring Gateway
+
+        - id: auth_route
+          uri: ${AUTH_MICROSERVICE_URI:http://localhost:8084}
+          predicates:
+            - Path=/auth/**
+          filters:
+            - AddRequestHeader=X-Powered-By, Spring Gateway
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
