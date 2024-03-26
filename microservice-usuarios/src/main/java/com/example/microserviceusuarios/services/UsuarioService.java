@@ -22,6 +22,6 @@ public interface UsuarioService {
     Boolean nroDocExiste(String nroDoc);
     Boolean bajaUsuario(String nroDoc);
     void agregarImagenUsuario(String nroDoc, MultipartFile imagen);
-    byte[] obtenerImagenUsuario(String nroDoc);
+    String obtenerImagenUsuario(String username);
 
 }

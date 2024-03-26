@@ -66,24 +66,22 @@ public class AuthController {
         }
     }
 
-    //Metodo para enviar codigo de verificacion al mail del usuario interno
+    // Método para enviar código de verificación al mail del usuario interno
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         try {
             String email = request.getEmail();
-            if (email != null && !email.isEmpty()) {
-                String verificationCode = authService.generateVerificationCode();
-                authService.sendVerificationCode(email, verificationCode);
-                authService.storeVerificationCodeInDatabase(email, verificationCode);
-                return ResponseEntity.ok("Se ha enviado un código de verificación al email del usuario.");
-            } else {
-                return ResponseEntity.badRequest().body("El email no puede estar vacío.");
-            }
+            String username = authService.forgotPassword(email);
+            return ResponseEntity.ok(username);
+        } catch (IllegalArgumentException e) {
+            log.error("Error during password reset request: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RuntimeException e) {
             log.error("Error during password reset request: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     //Metodo para usar codigo de verificacion para generar token para modificar password
     @PostMapping("/reset-password")

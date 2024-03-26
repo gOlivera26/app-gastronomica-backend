@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -150,14 +151,15 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
     }
 
+
     @Transactional
     @Override
-    public byte[] obtenerImagenUsuario(String nroDoc) {
-        UsuarioEntity usuario = obtenerUsuarioPorNroDoc(nroDoc);
+    public String obtenerImagenUsuario(String username) {
+        UsuarioEntity usuario = obtenerUsuarioPorUsername(username);
         if (usuario.getImagenProfile() == null) {
             throw new RuntimeException("El usuario no tiene imagen");
         }
-        return usuario.getImagenProfile();
+        return Base64.getEncoder().encodeToString(usuario.getImagenProfile());
     }
 
     private UsuarioEntity obtenerUsuarioPorNroDoc(String nroDoc) {
@@ -166,5 +168,12 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new RuntimeException("No se encontraron usuarios con el nro de documento especificado");
         }
         return usuarios.get();
+    }
+    private UsuarioEntity obtenerUsuarioPorUsername(String username){
+        Optional<UsuarioEntity> usuario = usuarioRepository.findByUsername(username);
+        if(usuario.isEmpty()){
+            throw new RuntimeException("No se encontraron usuarios con el username especificado");
+        }
+        return usuario.get();
     }
 }

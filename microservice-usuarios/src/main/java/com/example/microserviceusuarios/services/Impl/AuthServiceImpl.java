@@ -200,6 +200,23 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Código de verificación no válido");
         }
     }
+    @Transactional
+    @Override
+    public String forgotPassword(String email) {
+        if (email != null && !email.isEmpty()) {
+            Optional<UsuarioEntity> usuarioOptional = usuarioRepository.findByEmail(email);
+            if (usuarioOptional.isPresent()) {
+                String verificationCode = generateVerificationCode();
+                sendVerificationCode(email, verificationCode);
+                storeVerificationCodeInDatabase(email, verificationCode);
+                return usuarioOptional.get().getUsername();
+            } else {
+                throw new RuntimeException("No se encontró ningún usuario asociado al correo electrónico proporcionado.");
+            }
+        } else {
+            throw new IllegalArgumentException("El correo electrónico no puede estar vacío.");
+        }
+    }
 
     @Override
     public String generateVerificationCode() {

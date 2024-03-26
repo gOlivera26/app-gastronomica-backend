@@ -1,5 +1,6 @@
 package com.example.microserviceusuarios.jwt;
 
+import com.example.microserviceusuarios.entities.UsuarioEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -20,7 +21,12 @@ import java.util.function.Function;
 public class JwtService {
     private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     public String getToken(UserDetails user) {
-        return getToken(new HashMap<>(), user);
+        Map<String, Object> extraClaims = new HashMap<>();
+        if (user instanceof UsuarioEntity) {
+            UsuarioEntity usuario = (UsuarioEntity) user;
+            extraClaims.put("role", usuario.getRol().getDescripcion());
+        }
+        return getToken(extraClaims, user);
     }
     String getToken(Map<String, Object> extraClaims, UserDetails user) {
         return Jwts

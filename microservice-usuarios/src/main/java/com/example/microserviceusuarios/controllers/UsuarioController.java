@@ -95,21 +95,17 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/obtenerImagenProfile/{nroDoc}")
-    public ResponseEntity<byte[]> obtenerImagenUsuario(@PathVariable String nroDoc) {
+    @GetMapping("/obtenerImagenProfile/{username}")
+    public ResponseEntity<?> obtenerImagenUsuario(@PathVariable String username) {
         try {
-            byte[] imagen = usuarioService.obtenerImagenUsuario(nroDoc);
-            // Devuelve la imagen como respuesta con el tipo de contenido adecuado
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG); // Cambia esto según el tipo de imagen que manejes
-            return new ResponseEntity<>(imagen, headers, HttpStatus.OK);
+            String imagenBase64 = usuarioService.obtenerImagenUsuario(username);
+            return ResponseEntity.ok(imagenBase64);
         } catch (RuntimeException e) {
             String errorMessage = "Error al obtener la imagen del usuario: " + e.getMessage();
             log.warn(errorMessage);
-            return ResponseEntity.badRequest().body(errorMessage.getBytes());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
-
 
     @PostMapping("/crearRol")
     public ResponseEntity<?> crearRol(@RequestBody Rol rol){

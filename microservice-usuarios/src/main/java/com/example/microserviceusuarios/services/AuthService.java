@@ -18,5 +18,6 @@ public interface AuthService {
     void storeVerificationCodeInDatabase(String email, String verificationCode);
     String generateTokenForPasswordReset(String email, String verificationCode);
     String generateVerificationCode();
+    String forgotPassword(String email);
     void sendVerificationCode(String email, String verificationCode);
 }
