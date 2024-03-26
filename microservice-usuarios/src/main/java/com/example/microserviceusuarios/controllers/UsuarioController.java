@@ -1,8 +1,12 @@
 package com.example.microserviceusuarios.controllers;
 
+import com.example.microserviceusuarios.dtos.UsuarioResponse;
+import com.example.microserviceusuarios.entities.UsuarioEntity;
 import com.example.microserviceusuarios.models.Rol;
+import com.example.microserviceusuarios.models.Usuario;
 import com.example.microserviceusuarios.services.UsuarioService;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,10 +20,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/usuarios")
 public class UsuarioController {
     private final UsuarioService usuarioService;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, ModelMapper modelMapper) {
         this.usuarioService = usuarioService;
+        this.modelMapper = modelMapper;
     }
     @GetMapping("/obtenerUsuarios")
     public ResponseEntity<?> obtenerUsuarios(){
@@ -41,6 +47,20 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body(errorMessage);
         }
     }
+    @GetMapping("/obtenerUsuarioPorUsername/{username}")
+    public ResponseEntity<UsuarioResponse> obtenerUsuarioPorUsername(@PathVariable String username){
+        try{
+            UsuarioEntity usuarioEntity = usuarioService.obtenerUsuarioPorUsername(username);
+            Usuario usuario = modelMapper.map(usuarioEntity, Usuario.class);
+            return ResponseEntity.ok(modelMapper.map(usuario, UsuarioResponse.class));
+        }
+        catch (RuntimeException e){
+            String errorMessage = "Error al obtener el usuario por username: " + e.getMessage();
+            log.warn(errorMessage);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @GetMapping("/emailExiste/{email}")
     public ResponseEntity<?> emailExiste(@PathVariable String email){
         try {
@@ -81,12 +101,12 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body(errorMessage);
         }
     }
-    @PutMapping("/agregarImagenProfile/{nroDoc}/imagen")
-    public ResponseEntity<?> agregarImagenUsuario(@PathVariable String nroDoc,
+    @PutMapping("/agregarImagenProfile/{username}/imagen")
+    public ResponseEntity<?> agregarImagenUsuario(@PathVariable String username,
                                                   @RequestParam("imagen") MultipartFile imagen) {
         try {
-            usuarioService.agregarImagenUsuario(nroDoc, imagen);
-            log.info("Imagen agregada al usuario con nroDoc: {}", nroDoc);
+            usuarioService.agregarImagenUsuario(username, imagen);
+            log.info("Imagen agregada al usuario con nroDoc: {}", username);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             String errorMessage = "Error al agregar la imagen al usuario: " + e.getMessage();

@@ -81,8 +81,6 @@ public class UsuarioEntity implements UserDetails {
                 return List.of(new SimpleGrantedAuthority("ROLE_USER"));
         }
     }
-
-
     @Override
     public String getPassword() {
         return password;

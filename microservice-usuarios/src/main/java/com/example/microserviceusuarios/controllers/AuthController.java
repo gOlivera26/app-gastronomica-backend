@@ -53,7 +53,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-    @PostMapping("/updateUsuario")
+    @PutMapping("/updateUsuario")
     public ResponseEntity<?> updateBasicData(@RequestBody UpdateUserRequest request) {
         try {
             return ResponseEntity.ok(authService.actualizarUsuario(request));

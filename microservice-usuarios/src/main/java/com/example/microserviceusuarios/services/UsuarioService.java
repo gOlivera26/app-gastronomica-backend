@@ -21,7 +21,8 @@ public interface UsuarioService {
     Boolean usernameExiste(String username);
     Boolean nroDocExiste(String nroDoc);
     Boolean bajaUsuario(String nroDoc);
-    void agregarImagenUsuario(String nroDoc, MultipartFile imagen);
+    void agregarImagenUsuario(String username, MultipartFile imagen);
     String obtenerImagenUsuario(String username);
+    UsuarioEntity obtenerUsuarioPorUsername(String username);
 
 }

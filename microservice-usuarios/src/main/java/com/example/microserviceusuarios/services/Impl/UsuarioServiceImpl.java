@@ -135,8 +135,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Transactional
     @Override
-    public void agregarImagenUsuario(String nroDoc, MultipartFile imagen) {
-        UsuarioEntity usuario = obtenerUsuarioPorNroDoc(nroDoc);
+    public void agregarImagenUsuario(String username, MultipartFile imagen) {
+        UsuarioEntity usuario = obtenerUsuarioPorUsername(username);
         if (usuario == null) {
             throw new RuntimeException("El usuario no existe");
         }
@@ -169,7 +169,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         return usuarios.get();
     }
-    private UsuarioEntity obtenerUsuarioPorUsername(String username){
+    @Transactional
+    @Override
+    public UsuarioEntity obtenerUsuarioPorUsername(String username){
         Optional<UsuarioEntity> usuario = usuarioRepository.findByUsername(username);
         if(usuario.isEmpty()){
             throw new RuntimeException("No se encontraron usuarios con el username especificado");

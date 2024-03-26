@@ -103,16 +103,10 @@ public class AuthServiceImpl implements AuthService {
         if(existeNroDoc.isPresent() && !existeNroDoc.get().getId().equals(updateUserRequest.getId())) {
             throw new RuntimeException("Número de documento ya está en uso");
         }
-        Optional<UsuarioEntity> existeUsername = usuarioRepository.findByUsername(updateUserRequest.getUsername());
-        if(existeUsername.isPresent() && !existeUsername.get().getId().equals(updateUserRequest.getId())) {
-            throw new RuntimeException("Nombre de usuario ya está en uso");
-        }
-
         usuarioEntity.setNombre(updateUserRequest.getNombre());
         usuarioEntity.setApellido(updateUserRequest.getApellido());
         usuarioEntity.setNroDoc(updateUserRequest.getNroDoc());
         usuarioEntity.setTelefono(updateUserRequest.getTelefono());
-        usuarioEntity.setUsername(updateUserRequest.getUsername());
         usuarioEntity.setEmail(updateUserRequest.getEmail());
 
         RolEntity rol = rolRepository.findById(updateUserRequest.getIdRol().getId())
