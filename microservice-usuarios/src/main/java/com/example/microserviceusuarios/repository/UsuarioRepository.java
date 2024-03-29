@@ -21,4 +21,6 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long> {
     List<UsuarioEntity> findByRol(RolEntity rolEntity);
     @Query("SELECT new com.example.microserviceusuarios.entities.UsuarioEntity(u.id, u.nombre, u.apellido, u.username, u.nroDoc, u.email, u.telefono, u.password, u.activo, u.verificationCode, u.rol) FROM UsuarioEntity u WHERE u.username = :username")
     Optional<UsuarioEntity> findByUsernameWithoutImage(@Param("username") String username);
+
+    List<UsuarioEntity> findByActivo(Boolean activo);
 }

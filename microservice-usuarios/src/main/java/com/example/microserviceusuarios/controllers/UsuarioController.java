@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @RequestMapping("/usuarios")
@@ -56,6 +58,16 @@ public class UsuarioController {
         }
         catch (RuntimeException e){
             String errorMessage = "Error al obtener el usuario por username: " + e.getMessage();
+            log.warn(errorMessage);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+    @GetMapping("/obtenerUsuarioPorEstado/{activo}")
+    public ResponseEntity<List<Usuario>> obtenerUsuarioPorEstado(@PathVariable Boolean activo){
+        try {
+            return ResponseEntity.ok(usuarioService.obtenerUsuarioPorEstado(activo));
+        } catch (RuntimeException e) {
+            String errorMessage = "Error al obtener los usuarios por estado: " + e.getMessage();
             log.warn(errorMessage);
             return ResponseEntity.badRequest().body(null);
         }

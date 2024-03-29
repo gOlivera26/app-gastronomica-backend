@@ -55,6 +55,15 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarios.stream().map(usuario -> modelMapper.map(usuario, Usuario.class)).toList();
     }
 
+    @Transactional
+    @Override
+    public List<Usuario> obtenerUsuarioPorEstado(Boolean activo) {
+        List<UsuarioEntity> usuarios = usuarioRepository.findByActivo(activo);
+        if(usuarios == null){
+            throw new RuntimeException("No se encontraron usuarios con estado: "+ activo);
+        }
+        return usuarios.stream().map(usuario -> modelMapper.map(usuario, Usuario.class)).toList();
+    }
 
 
     @Override

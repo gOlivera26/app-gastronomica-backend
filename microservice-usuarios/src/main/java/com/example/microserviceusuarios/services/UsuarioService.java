@@ -13,6 +13,7 @@ public interface UsuarioService {
 
     List<Usuario> obtenerUsuarios();
     List<Usuario> obtenerUsuariosPorRol(Long idRol);
+    List<Usuario> obtenerUsuarioPorEstado(Boolean estado);
     Rol crearRol(Rol rol);
     Rol eliminarRol(Long id);
     Rol editarRol(Rol rol);
