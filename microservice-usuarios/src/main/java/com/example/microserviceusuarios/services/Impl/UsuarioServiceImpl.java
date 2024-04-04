@@ -187,4 +187,15 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         return usuario.get();
     }
+
+    @Override
+    @Transactional
+    public Usuario deleteUsuarioByUsername(String username) {
+        Optional<UsuarioEntity> usuario = usuarioRepository.findByUsername(username);
+        if(usuario.isEmpty()){
+            throw new RuntimeException("No se encontraron usuarios con el username:"+username+ " especificado");
+        }
+        usuarioRepository.delete(usuario.get());
+        return modelMapper.map(usuario.get(), Usuario.class);
+    }
 }

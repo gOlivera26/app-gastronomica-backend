@@ -163,6 +163,19 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+    @DeleteMapping("/eliminarUsuario/{username}")
+    public ResponseEntity<Usuario> deleteUsuario(@PathVariable String username){
+        try {
+            Usuario usuarioEliminado = usuarioService.deleteUsuarioByUsername(username);
+            log.info("Usuario eliminado: {}", usuarioEliminado);
+            return ResponseEntity.ok(usuarioEliminado);
+        } catch (RuntimeException e) {
+            String errorMessage = "Error al eliminar el usuario: " + e.getMessage();
+            log.warn(errorMessage);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PutMapping("/editarRol")
     public ResponseEntity<?> editarRol(@RequestBody Rol rol){
         try {

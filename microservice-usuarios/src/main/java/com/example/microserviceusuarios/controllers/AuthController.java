@@ -27,7 +27,7 @@ public class AuthController {
         this.restTemplateClientes = restTemplateClientes;
     }
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             return ResponseEntity.ok(authService.login(request));
         } catch (RuntimeException e) {
@@ -35,7 +35,7 @@ public class AuthController {
             if (errorMessage.equals("Usuario no encontrado")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             } else if (errorMessage.equals("Usuario no activo")) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Usuario no activo");
             }
              else {
                 log.error("Error during login: {}", errorMessage);

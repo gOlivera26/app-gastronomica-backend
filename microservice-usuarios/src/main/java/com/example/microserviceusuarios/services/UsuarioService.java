@@ -13,7 +13,7 @@ public interface UsuarioService {
 
     List<Usuario> obtenerUsuarios();
     List<Usuario> obtenerUsuariosPorRol(Long idRol);
-    List<Usuario> obtenerUsuarioPorEstado(Boolean estado);
+    List<Usuario> obtenerUsuarioPorEstado(Boolean estado);  
     Rol crearRol(Rol rol);
     Rol eliminarRol(Long id);
     Rol editarRol(Rol rol);
@@ -25,5 +25,6 @@ public interface UsuarioService {
     void agregarImagenUsuario(String username, MultipartFile imagen);
     String obtenerImagenUsuario(String username);
     UsuarioEntity obtenerUsuarioPorUsername(String username);
+    Usuario deleteUsuarioByUsername(String username);
 
 }
