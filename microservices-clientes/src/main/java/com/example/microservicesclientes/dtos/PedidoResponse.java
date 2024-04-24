@@ -21,6 +21,7 @@ public class PedidoResponse {
     private String estado;
     private String observacion;
     private Double total;
+    private String nroTurno;
     private List<DetallePedidoResponse> detallePedido;
 
 

@@ -14,6 +14,7 @@ public interface ProductoService {
     Producto modificarProducto(Producto producto);
     List<Producto> obtenerProductos();
     List<Producto> obtenerProductoPorTipo(Long id);
+    List<Producto> obtenerProductoNovedad();
     void actualizarStock(StockDto stockDto);
     void actualizarPrecioGlobal(Double porcentajeAumento);
     TipoProductoEntity crearTipoProducto(TipoProductoEntity producto);

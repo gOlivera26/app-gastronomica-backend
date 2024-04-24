@@ -27,4 +27,6 @@ public class ProductoEntity {
     private TipoProductoEntity tipoProducto;
     @Column
     private String imagen;
+    @Column
+    private Boolean novedad;
 }

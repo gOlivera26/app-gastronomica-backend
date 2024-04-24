@@ -18,5 +18,6 @@ public class Pedido {
     private Double total;
     private Boolean estado;
     private String observacion;
+    private String numeroTurno;
     private List<DetallePedido> detallePedido;
 }

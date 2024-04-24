@@ -7,13 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Producto {
+public class ClienteTemporal {
     private Long id;
     private String nombre;
-    private String descripcion;
-    private Double precio;
-    private Integer stock;
-    private String imagen;
-    private TipoProducto tipoProducto;
-    private Boolean novedad;
+    private String apellido;
 }

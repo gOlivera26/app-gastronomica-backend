@@ -32,12 +32,22 @@ public class PedidoEntity {
     @Column
     private Double total;
 
+    @Column
+    private String numeroTurno;
+
     @Enumerated(EnumType.STRING)
     private EstadoPedido estado;
 
     @Column
     private String observacion;
 
+    @Column
+    private String nombreCliente;
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<DetallePedidoEntity> detallePedido;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "factura_id", referencedColumnName = "id")
+    private FacturaEntity factura;
 }

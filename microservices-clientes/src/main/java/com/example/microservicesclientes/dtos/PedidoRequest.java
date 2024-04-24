@@ -19,4 +19,5 @@ public class PedidoRequest {
     private String direccionEntrega;
     private String observacion;
     private List<DetallePedidoRequest> detallePedido;
+    private String nombreCliente;
 }

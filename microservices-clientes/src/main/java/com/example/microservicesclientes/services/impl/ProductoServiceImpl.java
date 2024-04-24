@@ -93,6 +93,15 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    public List<Producto> obtenerProductoNovedad() {
+        Optional<ProductoEntity> producto = productoRepository.findByNovedadTrue();
+        if(producto.isEmpty()){
+            throw new RuntimeException("No se encontraron productos");
+        }
+        return List.of(modelMapper.map(producto.get(), Producto.class));
+    }
+
+    @Override
     public void actualizarStock(StockDto stockDto) {
         Optional<ProductoEntity> productoEntity = productoRepository.findById(stockDto.getIdProducto());
         if(productoEntity.isEmpty()){

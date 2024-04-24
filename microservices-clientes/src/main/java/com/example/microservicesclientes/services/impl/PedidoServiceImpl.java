@@ -5,15 +5,9 @@ import com.example.microservicesclientes.dtos.DetallePedidoRequest;
 import com.example.microservicesclientes.dtos.DetallePedidoResponse;
 import com.example.microservicesclientes.dtos.PedidoRequest;
 import com.example.microservicesclientes.dtos.PedidoResponse;
-import com.example.microservicesclientes.entities.ClienteEntity;
-import com.example.microservicesclientes.entities.DetallePedidoEntity;
-import com.example.microservicesclientes.entities.PedidoEntity;
-import com.example.microservicesclientes.entities.ProductoEntity;
+import com.example.microservicesclientes.entities.*;
 import com.example.microservicesclientes.enums.EstadoPedido;
-import com.example.microservicesclientes.repository.ClienteRepository;
-import com.example.microservicesclientes.repository.DetallePedidoRepository;
-import com.example.microservicesclientes.repository.PedidoRepository;
-import com.example.microservicesclientes.repository.ProductoRepository;
+import com.example.microservicesclientes.repository.*;
 import com.example.microservicesclientes.services.PedidoService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -21,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,28 +27,42 @@ public class PedidoServiceImpl implements PedidoService {
     private final ClienteRepository clienteRepository;
     private final DetallePedidoRepository detallePedidoRepository;
     private final ProductoRepository productoRepository;
+    private final FacturaRepository facturaRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public PedidoServiceImpl(PedidoRepository pedidoRepository, ModelMapper modelMapper, ClienteRepository clienteRepository, DetallePedidoRepository detallePedidoRepository, ProductoRepository productoRepository) {
+    public PedidoServiceImpl(PedidoRepository pedidoRepository, ModelMapper modelMapper, ClienteRepository clienteRepository, DetallePedidoRepository detallePedidoRepository, ProductoRepository productoRepository, FacturaRepository facturaRepository) {
         this.pedidoRepository = pedidoRepository;
         this.modelMapper = modelMapper;
         this.clienteRepository = clienteRepository;
         this.detallePedidoRepository = detallePedidoRepository;
         this.productoRepository = productoRepository;
+        this.facturaRepository = facturaRepository;
     }
 
     @Override
     @Transactional
     public PedidoRequest crearPedido(PedidoRequest pedidoRequest) {
         try {
-            Optional<ClienteEntity> existeCliente = clienteRepository.findById(pedidoRequest.getIdCliente());
-            if (!existeCliente.isPresent()) {
-                throw new RuntimeException("Cliente no encontrado");
+            ClienteEntity cliente;
+            if (pedidoRequest.getIdCliente() == null || pedidoRequest.getIdCliente() == 0) {
+                cliente = new ClienteEntity();
+                cliente.setNombre(pedidoRequest.getNombreCliente());
+
+                cliente = clienteRepository.save(cliente);
+            } else {
+                Optional<ClienteEntity> existeCliente = clienteRepository.findById(pedidoRequest.getIdCliente());
+                if (!existeCliente.isPresent()) {
+                    throw new RuntimeException("No se encontró un cliente con el ID especificado");
+                }
+                cliente = existeCliente.get();
             }
 
             PedidoEntity pedido = modelMapper.map(pedidoRequest, PedidoEntity.class);
+            pedido.setCliente(cliente);
+            pedido.setNumeroTurno(generarNumeroTurno());
             pedido.setEstado(EstadoPedido.REGISTRADO);
+
 
             double totalPedido = 0.0;
             for (DetallePedidoEntity detalle : pedido.getDetallePedido()) {
@@ -71,11 +80,39 @@ public class PedidoServiceImpl implements PedidoService {
             }
             pedido.setTotal(totalPedido);
 
+            // Crear la factura asociada al pedido
+            FacturaEntity factura = new FacturaEntity();
+            factura.setNumeroFactura(generarNumeroFactura());
+            factura.setFechaEmision(LocalDate.now());
+            factura.setTotal(totalPedido);
+            factura.setPedido(pedido);
+
+            // Asignar la factura al pedido
+            pedido.setFactura(factura);
+
             PedidoEntity pedidoGuardado = pedidoRepository.save(pedido);
+
             return modelMapper.map(pedidoGuardado, PedidoRequest.class);
         } catch (Exception e) {
             throw new RuntimeException("Error al crear el pedido", e);
         }
+    }
+    private String generarNumeroTurno(){
+        return "T" + (pedidoRepository.count()+1);
+    }
+
+    private String generarNumeroFactura() {
+
+        String letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String numeros = "0123456789";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            sb.append(letras.charAt((int) (letras.length() * Math.random())));
+        }
+        for (int i = 0; i < 3; i++) {
+            sb.append(numeros.charAt((int) (numeros.length() * Math.random())));
+        }
+        return sb.toString();
     }
 
     @Override
@@ -120,6 +157,7 @@ public class PedidoServiceImpl implements PedidoService {
             pedidoResponse.setNombre(pedido.getCliente().getNombre());
             pedidoResponse.setApellido(pedido.getCliente().getApellido());
             pedidoResponse.setNroDoc(pedido.getCliente().getNroDoc());
+            pedidoResponse.setNroTurno(pedido.getNumeroTurno());
             pedidoResponse.setDetallePedido(new ArrayList<>());
             //obtener el nombre del producto y el precio
             for (DetallePedidoEntity detalle : pedido.getDetallePedido()) {

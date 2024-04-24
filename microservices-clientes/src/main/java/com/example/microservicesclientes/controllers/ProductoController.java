@@ -94,6 +94,16 @@ public class ProductoController {
         log.info("Productos encontrados: {}", productos);
         return ResponseEntity.ok(productos);
     }
+    @GetMapping("/obtenerProductoNovedad")
+    public ResponseEntity<List<Producto>> obtenerProductoNovedad() {
+        List<Producto> producto = productoService.obtenerProductoNovedad();
+        if(producto == null){
+            log.warn("No se encontraron productos");
+            return ResponseEntity.badRequest().build();
+        }
+        log.info("Producto encontrado: {}", producto);
+        return ResponseEntity.ok(producto);
+    }
 
     //Tipo Producto
     @PostMapping("/crearTipoProducto")
