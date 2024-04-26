@@ -20,4 +20,7 @@ public class PedidoRequest {
     private String observacion;
     private List<DetallePedidoRequest> detallePedido;
     private String nombreCliente;
+
+    public void setCheckoutUrl(String checkoutUrl) {
+    }
 }

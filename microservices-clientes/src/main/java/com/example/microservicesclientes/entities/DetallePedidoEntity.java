@@ -27,4 +27,15 @@ public class DetallePedidoEntity {
     @ManyToOne(fetch = FetchType.LAZY) // Un detalle de pedido pertenece a un pedido
     @JoinColumn(name = "pedido_id")
     private PedidoEntity pedido;
+
+    @Override
+    public String toString() {
+        return "DetallePedidoEntity{" +
+                "id=" + id +
+                ", producto=" + (producto != null ? producto.getId() : "null") +
+                ", cantidad=" + cantidad +
+                ", subtotal=" + subtotal +
+                '}';
+    }
+
 }

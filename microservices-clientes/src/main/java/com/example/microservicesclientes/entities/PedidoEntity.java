@@ -50,4 +50,20 @@ public class PedidoEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "factura_id", referencedColumnName = "id")
     private FacturaEntity factura;
+
+    @Override
+    public String toString() {
+        return "PedidoEntity{" +
+                "id=" + id +
+                ", cliente=" + (cliente != null ? cliente.getId() : "null") +
+                ", fechaPedido=" + fechaPedido +
+                ", direccionEntrega='" + direccionEntrega + '\'' +
+                ", total=" + total +
+                ", numeroTurno='" + numeroTurno + '\'' +
+                ", estado=" + estado +
+                ", observacion='" + observacion + '\'' +
+                ", nombreCliente='" + nombreCliente + '\'' +
+                '}';
+    }
+
 }

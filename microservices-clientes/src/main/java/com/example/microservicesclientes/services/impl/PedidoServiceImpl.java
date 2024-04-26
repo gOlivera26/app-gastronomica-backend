@@ -28,16 +28,18 @@ public class PedidoServiceImpl implements PedidoService {
     private final DetallePedidoRepository detallePedidoRepository;
     private final ProductoRepository productoRepository;
     private final FacturaRepository facturaRepository;
+    private final CheckoutProService checkoutProService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public PedidoServiceImpl(PedidoRepository pedidoRepository, ModelMapper modelMapper, ClienteRepository clienteRepository, DetallePedidoRepository detallePedidoRepository, ProductoRepository productoRepository, FacturaRepository facturaRepository) {
+    public PedidoServiceImpl(PedidoRepository pedidoRepository, ModelMapper modelMapper, ClienteRepository clienteRepository, DetallePedidoRepository detallePedidoRepository, ProductoRepository productoRepository, FacturaRepository facturaRepository, CheckoutProService checkoutProService) {
         this.pedidoRepository = pedidoRepository;
         this.modelMapper = modelMapper;
         this.clienteRepository = clienteRepository;
         this.detallePedidoRepository = detallePedidoRepository;
         this.productoRepository = productoRepository;
         this.facturaRepository = facturaRepository;
+        this.checkoutProService = checkoutProService;
     }
 
     @Override
@@ -91,12 +93,17 @@ public class PedidoServiceImpl implements PedidoService {
             pedido.setFactura(factura);
 
             PedidoEntity pedidoGuardado = pedidoRepository.save(pedido);
+            String checkoutUrl = checkoutProService.createPreference(pedidoGuardado);
+            PedidoRequest pedidoResponse = modelMapper.map(pedidoGuardado, PedidoRequest.class);
+            pedidoResponse.setCheckoutUrl(checkoutUrl);
+            System.out.println("CheckoutUrl:" + checkoutUrl);
+            return pedidoResponse;
 
-            return modelMapper.map(pedidoGuardado, PedidoRequest.class);
         } catch (Exception e) {
             throw new RuntimeException("Error al crear el pedido", e);
         }
     }
+
     private String generarNumeroTurno(){
         return "T" + (pedidoRepository.count()+1);
     }

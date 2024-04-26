@@ -1,6 +1,7 @@
 package com.example.microservicesclientes.services;
 
 import com.example.microservicesclientes.dtos.StockDto;
+import com.example.microservicesclientes.entities.ProductoEntity;
 import com.example.microservicesclientes.entities.TipoProductoEntity;
 import com.example.microservicesclientes.models.Producto;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ public interface ProductoService {
     Producto crearProducto(Producto producto);
     Producto eliminarProductoPorId(Long id);
     Producto modificarProducto(Producto producto);
+    ProductoEntity obtenerProductoPorId(Long id);
     List<Producto> obtenerProductos();
     List<Producto> obtenerProductoPorTipo(Long id);
     List<Producto> obtenerProductoNovedad();

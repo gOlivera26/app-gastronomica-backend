@@ -71,6 +71,15 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    public ProductoEntity obtenerProductoPorId(Long id) {
+        Optional<ProductoEntity> producto = productoRepository.findById(id);
+        if(producto.isEmpty()){
+            throw new RuntimeException("El producto no existe");
+        }
+        return modelMapper.map(producto.get(), ProductoEntity.class);
+    }
+
+    @Override
     public List<Producto> obtenerProductos() {
         List<ProductoEntity> productos = productoRepository.findAll();
         if(productos.isEmpty()){
