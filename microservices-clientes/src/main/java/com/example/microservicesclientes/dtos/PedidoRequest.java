@@ -20,7 +20,9 @@ public class PedidoRequest {
     private String observacion;
     private List<DetallePedidoRequest> detallePedido;
     private String nombreCliente;
+    private String checkoutUrl;
 
     public void setCheckoutUrl(String checkoutUrl) {
+        this.checkoutUrl = checkoutUrl;
     }
 }

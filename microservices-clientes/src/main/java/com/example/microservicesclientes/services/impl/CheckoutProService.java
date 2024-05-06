@@ -51,7 +51,6 @@ public class CheckoutProService {
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                 .items(items)
                 .build();
-
         try {
             // Send preference request using Mercado Pago SDK
             System.out.println("Access token: " + checkoutProConfig.getAccessToken());
